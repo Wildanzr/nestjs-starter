@@ -1,9 +1,11 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
+import { ResponseFormater } from './common/interceptors/response.interceptor';
+import { HttpExceptionFilter } from './common/filter/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -44,6 +46,13 @@ async function bootstrap() {
     .build()
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('docs', app, document);
+
+  // Interceptors
+  const reflector = new Reflector();
+  app.useGlobalInterceptors(new ResponseFormater(reflector));
+
+  // Exeption Filter
+  app.useGlobalFilters(new HttpExceptionFilter())
 
   // Helmet
   app.use(helmet())

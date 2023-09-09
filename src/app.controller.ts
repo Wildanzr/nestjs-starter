@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString, MaxLength } from 'class-validator';
+import { ResponseMessage } from '@/common/decorators/response.decorator';
 
 class Test {
   @ApiProperty({ required: true, type: String, description: 'Name' })
@@ -21,11 +22,13 @@ export class AppController {
   constructor(private readonly appService: AppService) { }
 
   @Get()
+  @ResponseMessage("Hello")
   getHello(): string {
     return this.appService.getHello();
   }
 
   @Post('test')
+  @ResponseMessage("Test")
   getTest(@Body() body: Test): Test {
     return body;
   }
